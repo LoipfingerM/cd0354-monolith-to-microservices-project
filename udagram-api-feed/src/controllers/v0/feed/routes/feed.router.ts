@@ -37,6 +37,7 @@ router.get('/', async (req: Request, res: Response) => {
     }
     return item;
   }));
+  console.log(new Date().toLocaleString() + `: GET /feed/ : count=${items.count}`);
   res.send({count: items.count, rows: itemsWithUrls});
 });
 
@@ -45,6 +46,7 @@ router.get('/:id',
     async (req: Request, res: Response) => {
       const {id} = req.params;
       const item = await FeedItem.findByPk(id);
+      console.log(new Date().toLocaleString() + `: GET /feed/${id} : item=${item}`);
       res.send(item);
     });
 
@@ -54,6 +56,7 @@ router.get('/signed-url/:fileName',
   async (req: Request, res: Response) => {
     const {fileName} = req.params;
     const url = await AWS.getPutSignedUrl(fileName);
+    console.log(new Date().toLocaleString() + `: GET /feed/signed-url/${fileName} : url=${url}`);
     res.status(201).send({url: url});
   });
 
@@ -64,10 +67,12 @@ router.post('/',
       const caption = req.body.caption;
       const fileName = req.body.url; // same as S3 key name
       if (!caption) {
+        console.log(new Date().toLocaleString() + `: POST /feed/ : 400 : caption is required or malformed.`);
         return res.status(400).send({message: 'Caption is required or malformed.'});
       }
 
       if (!fileName) {
+        console.log(new Date().toLocaleString() + `: POST /feed/ : 400 : file url is required.`);
         return res.status(400).send({message: 'File url is required.'});
       }
 
@@ -78,6 +83,7 @@ router.post('/',
 
       const savedItem = await item.save();
       savedItem.url = await AWS.getGetSignedUrl(savedItem.url);
+      console.log(new Date().toLocaleString() + `: POST /feed/ : item=${savedItem}`);
       res.status(201).send(savedItem);
     });
 
