@@ -17,6 +17,7 @@ spec:
       containers:
       - name: udagram-reverseproxy
         image: markus2101/reverseproxy:v1
+        imagePullPolicy: Always
         ports:
         - containerPort: 8080
         env:
